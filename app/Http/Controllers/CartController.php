@@ -24,6 +24,10 @@ class CartController extends Controller
         $cart = session()->get('cart', []);
 
         $designText = $request->input('design_text');
+        $color = $request->input('color', '');
+        $size  = $request->input('size', '');
+        $cartKey = $product->id . '|' . $color . '|' . $size;
+
         $designFile = null;
         if ($request->hasFile('design_file')) {
             $request->validate([
@@ -32,17 +36,19 @@ class CartController extends Controller
             $designFile = $request->file('design_file')->store('designs', 'public');
         }
 
-        if (isset($cart[$product->id])) {
-            $cart[$product->id]['quantity']++;
-            if ($designText) $cart[$product->id]['design_text'] = $designText;
-            if ($designFile) $cart[$product->id]['design_file'] = $designFile;
+        if (isset($cart[$cartKey])) {
+            $cart[$cartKey]['quantity']++;
+            if ($designText) $cart[$cartKey]['design_text'] = $designText;
+            if ($designFile) $cart[$cartKey]['design_file'] = $designFile;
         } else {
-            $cart[$product->id] = [
+            $cart[$cartKey] = [
                 'name'        => $product->name,
                 'price'       => $product->price,
                 'quantity'    => 1,
                 'image'       => $product->image,
                 'slug'        => $product->slug,
+                'color'       => $color,
+                'size'        => $size,
                 'design_text' => $designText ?: null,
                 'design_file' => $designFile ?: null,
             ];

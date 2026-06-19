@@ -97,9 +97,11 @@
                 @endif
 
                 @if($product->stock > 0)
-                    <form method="POST" action="{{ route('cart.add') }}" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('cart.add') }}" enctype="multipart/form-data" id="atc-form">
                         @csrf
                         <input type="hidden" name="product_id" value="{{ $product->id }}">
+                        <input type="hidden" name="color" id="selected-color" value="{{ $product->colors[0] ?? '' }}">
+                        <input type="hidden" name="size" id="selected-size" value="{{ $product->sizes[0] ?? '' }}">
 
                         {{-- Add Your Design --}}
                         <div style="margin:28px 0;border-top:1px solid var(--border);padding-top:24px;">
@@ -217,6 +219,8 @@ document.querySelectorAll('.variant-btn').forEach(btn => {
         const group = btn.dataset.variant;
         document.querySelectorAll(`.variant-btn[data-variant="${group}"]`).forEach(b => b.classList.remove('is-selected'));
         btn.classList.add('is-selected');
+        if (group === 'color') document.getElementById('selected-color').value = btn.textContent.trim();
+        if (group === 'size') document.getElementById('selected-size').value = btn.textContent.trim();
     });
 });
 </script>

@@ -39,6 +39,13 @@
                                 <div>
                                     <p class="cart-item__title">{{ $item['name'] }}</p>
                                     <p class="cart-item__price">${{ number_format($item['price'], 2) }}</p>
+                                    @if(!empty($item['color']) || !empty($item['size']))
+                                        <p class="cart-item__variants">
+                                            @if(!empty($item['color'])) {{ $item['color'] }} @endif
+                                            @if(!empty($item['color']) && !empty($item['size'])) · @endif
+                                            @if(!empty($item['size'])) {{ $item['size'] }} @endif
+                                        </p>
+                                    @endif
                                     @if(!empty($item['design_text']))
                                         <p class="cart-item__design-text">✏ "{{ $item['design_text'] }}"</p>
                                     @endif
