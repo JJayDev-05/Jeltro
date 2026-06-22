@@ -35,4 +35,16 @@ return [
         ],
     ],
 
+    // Shared secret for the public chatbot/product API. Callers must send it
+    // in the X-Api-Key header. Set CHATBOT_API_KEY in your .env.
+    'chatbot' => [
+        'key' => env('CHATBOT_API_KEY'),
+    ],
+
+    // Groq LLM, used by the in-app shopping assistant (ChatController).
+    'groq' => [
+        'key'   => env('GROQ_API_KEY'),
+        'model' => env('GROQ_MODEL', 'llama-3.3-70b-versatile'),
+    ],
+
 ];

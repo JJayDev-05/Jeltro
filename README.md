@@ -12,6 +12,7 @@ A full-stack e-commerce web application for a custom apparel studio, built with 
 - **Styling:** Custom CSS (no frameworks)
 - **Auth:** Laravel Breeze
 - **Storage:** Laravel Storage (local)
+- **AI:** Groq API — Llama 3.3 70B with tool / function calling
 
 ---
 
@@ -48,6 +49,24 @@ A full-stack e-commerce web application for a custom apparel studio, built with 
 - Cancel request approvals / rejections
 - Pending order count badges in sidebar
 
+### AI Shopping Assistant
+- In-app chat widget (logged-in users) powered by Groq's Llama 3.3 70B
+- Uses LLM **tool calling** — the model decides when to search the live catalog and with which filters (keyword, gender, color, size, price, stock)
+- Replies conversationally using real product data, with clickable product links
+- Conversation memory for natural follow-up questions ("show me that in red")
+- Resilient: auto-retries transient model glitches and degrades gracefully
+- Implemented in plain Laravel ([`ChatController`](app/Http/Controllers/ChatController.php)) — runs the full tool-calling loop server-side, no external services
+
+### Product Search API
+A read-only JSON API the assistant — or external automation tools like n8n / Make — can call as a tool:
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api/products` | Search & filter: `q`, `category`, `gender`, `color`, `size`, `min_price`, `max_price`, `in_stock`, `limit` |
+| `GET /api/products/{slug}` | Single product details & stock |
+
+Protected by an `X-Api-Key` header (set `CHATBOT_API_KEY` in `.env`).
+
 ---
 
 ## Local Setup
@@ -63,6 +82,10 @@ composer install
 # Environment setup
 cp .env.example .env
 php artisan key:generate
+
+# AI assistant: add a Groq API key to .env (free at https://console.groq.com)
+# GROQ_API_KEY=your_key_here
+# CHATBOT_API_KEY=any_random_string   # only needed if exposing the product API to external tools
 
 # Database
 touch database/database.sqlite

@@ -209,5 +209,7 @@ function deleteNotif(btn) {
     });
 }
 </script>
+
+@include('partials.chatbot')
 </body>
 </html>

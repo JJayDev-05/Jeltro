@@ -8,6 +8,7 @@ use App\Http\Controllers\SavedProductController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\ChatController;
 use Illuminate\Support\Facades\Route;
 
 // Static pages
@@ -22,6 +23,9 @@ Route::get('/search/suggestions', [ShopController::class, 'suggestions'])->name(
 Route::get('/', [ShopController::class, 'home'])->name('home');
 Route::get('/shop', [ShopController::class, 'index'])->name('shop');
 Route::get('/shop/{slug}', [ShopController::class, 'show'])->name('shop.show');
+
+// AI shopping assistant (chat widget posts here; logged-in users only)
+Route::post('/chat', [ChatController::class, 'message'])->middleware('auth')->name('chat.message');
 
 // Auth required
 Route::middleware('auth')->group(function () {
