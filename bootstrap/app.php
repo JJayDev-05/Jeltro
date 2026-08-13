@@ -17,6 +17,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'verify.api.key' => \App\Http\Middleware\VerifyApiKey::class,
         ]);
+
+        $middleware->web(prepend: [
+            \app\Http\Middleware\EnsureDatabaseIsAwake::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
