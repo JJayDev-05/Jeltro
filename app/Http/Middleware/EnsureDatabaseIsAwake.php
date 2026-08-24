@@ -11,26 +11,18 @@ class EnsureDatabaseIsAwake
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $maxAttempts = 5;
+        $maxAttempts = 6;
 
         for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
             try {
                 DB::select('select 1');
-                return $next($request);
+                break; // database is awake and responding, proceed normally
             } catch (\Throwable $e) {
-                DB::purge();
-
                 if ($attempt === $maxAttempts) {
-                    return response(
-                        '<html><body style="font-family:sans-serif;text-align:center;padding-top:100px;">'
-                        .'<h2>Waking up the database…</h2>'
-                        .'<p>This only happens after a period of inactivity. Please refresh in a few seconds.</p>'
-                        .'</body></html>',
-                        503
-                    );
+                    throw $e; // out of retries, let it actually fail
                 }
-
-                usleep(400000 * $attempt);
+                DB::purge(); // drop the dead connection so the next attempt reconnects fresh
+                usleep(500000 * $attempt); // wait a bit longer each retry: 0.5s, 1s, 1.5s...
             }
         }
 
