@@ -5,6 +5,14 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 
+// Ensure the SQLite database file exists on the persistent volume before
+// Laravel boots and tries to connect to it (SQLite won't auto-create it).
+$sqlitePath = '/app/storage/database.sqlite';
+if (! file_exists($sqlitePath)) {
+    @mkdir(dirname($sqlitePath), 0775, true);
+    touch($sqlitePath);
+}
+
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
