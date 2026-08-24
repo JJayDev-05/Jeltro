@@ -9,7 +9,14 @@ use App\Http\Controllers\ShopController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ChatController;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
+
+// TEMPORARY — remove after running once
+Route::get('/run-migrations-once-xk29', function () {
+    Artisan::call('migrate', ['--force' => true]);
+    return '<pre>' . Artisan::output() . '</pre>';
+});
 
 // Static pages
 Route::view('/about', 'pages.about')->name('about');
