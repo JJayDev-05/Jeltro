@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -42,15 +43,34 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
-
-            throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
-            ]);
+        if (Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+            RateLimiter::clear($this->throttleKey());
+            return;
         }
 
-        RateLimiter::clear($this->throttleKey());
+        // Portfolio demo mode: any email/password combo logs into a shared
+        // demo account, EXCEPT when someone is specifically attempting (and
+        // failing) to log in as the real admin — that still fails normally.
+        if (Str::lower($this->string('email')) !== 'admin@jeltro.com') {
+            $demoUser = User::firstOrCreate(
+                ['email' => 'demo@jeltro.com'],
+                [
+                    'name' => 'Demo User',
+                    'password' => Str::random(32),
+                    'email_verified_at' => now(),
+                ]
+            );
+
+            Auth::login($demoUser, $this->boolean('remember'));
+            RateLimiter::clear($this->throttleKey());
+            return;
+        }
+
+        RateLimiter::hit($this->throttleKey());
+
+        throw ValidationException::withMessages([
+            'email' => trans('auth.failed'),
+        ]);
     }
 
     /**
