@@ -11,6 +11,12 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ChatController;
 use Illuminate\Support\Facades\Route;
 
+// TEMPORARY — remove after running once
+Route::get('/run-seed-once-xk29', function () {
+    \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'AdminUserSeeder', '--force' => true]);
+    return '<pre>' . \Illuminate\Support\Facades\Artisan::output() . '</pre>';
+});
+
 // Static pages
 Route::view('/about', 'pages.about')->name('about');
 Route::view('/journal', 'pages.journal')->name('journal');
